@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-using-pvc
+spec:
+  volumes:
+    - name: pv-any-name
+      persistentVolumeClaim:
+        claimName: pv-claim-dyn-1g
+  containers:
+    - name: pv-container-any-name
+      image: nginx
+      ports:
+        - containerPort: 80
+          name: "http-server"
+      volumeMounts:
+        - mountPath: "/usr/share/nginx/html" #Mount point dentro do pod
+          name: pv-any-name

@@ -1,0 +1,34 @@
+# Persistent Volume define a capacidade volumétrica,
+# porém não cria nenhum volume efetivamente. É o recurso PVC (Pers. Vol. Claim)
+# que irá  criar efetivamente o volume a ser usado por um POD.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nc-homelab-app-pv-v2 #Nome do PV
+  namespace: storage-cloud
+  labels:
+    type: local
+spec:
+  storageClassName: local-nc-homelab #Pode ser qualquer nome contanto que o PVC aponte para ele.
+  capacity:
+    storage: 2Gi #Capacidade volumétrica de entrega. É o PVC que irá definir o tamanho do volume.
+  accessModes:
+    - ReadWriteOnce #Somente um único Node pode montar esse PV em read-write
+  hostPath:
+    path: "/mnt/data" #Local onde os volumes serao criados no Node
+---
+#É o PVC que irá definir a capacidade e criar o volume que
+#posteriormente será usado por um pod.
+#Este "pedaço" volumetrico será retirado do PersistentVolume anteriormente criado
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nc-homelab-app-pvc-v2
+  namespace: storage-cloud
+spec:
+  storageClassName: local-nc-homelab #Deve ter o mesmo nome do SC do PV
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi #Capacidade do volume. Teoricamente não pode superar o espaco disponivel PV. Apesar de ser possivel colocar um tamanho menor, o volume ira ficar com o tamanho do definido la no PV

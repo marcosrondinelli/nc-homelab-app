@@ -1,0 +1,17 @@
+# Este volume só será criado efetivamente quando um pod se associar a ele.
+# "waiting for first consumer to be created before binding"
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nc-homelab-db-pvc
+  namespace: storage-cloud
+  labels:
+    app: nc-homelab-db-pvc
+spec:
+  storageClassName: local-path #Opcional pq este é o SC default
+  volumeMode: Filesystem  #Opcional pq este é o modo default. (Filesystem or Block)
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
