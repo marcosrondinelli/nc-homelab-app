@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment # Create a deployment
+metadata:
+  name: nc-homelab-postgres # Set the name of the deployment
+spec:
+  replicas: 1 # Set N deployment replicas
+  selector:
+    matchLabels: # matchLabels tells the resource (service, deployment etc) what is the label to match the pod
+      app: nc-homelab-postgres
+  template:   # POD template
+    metadata:
+      labels: # Another way to tell the resource what is the label to match the pod (for other respurces, maybe) ?
+        app: nc-homelab-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres # Docker image
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432 # Exposing the container port 5432 for PostgreSQL client connections.
+          envFrom:
+            - configMapRef:
+                name: postgres-secret # Using the ConfigMap postgres-secret
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgresdata
+      volumes:
+        - name: postgresdata
+          persistentVolumeClaim:
+            claimName: nc-homelab-postgres-pvc
+---
+apiVersion: v1
+kind: Service # Create service
+metadata:
+  name: nc-homelab-postgres-svc # Sets the service name
+  labels:
+    app: nc-homelab-postgres # Defines app to create service for
+spec:
+  type: NodePort # Sets the service type
+  ports:
+    - port: 5432 # Sets the port to run the postgres application
+  selector:
+    app: nc-homelab-postgres

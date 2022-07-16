@@ -1,0 +1,12 @@
+# Create ConfigMap postgres-secret for the postgres app
+# Define default database name, user, and password
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nc-homelab-postgres-secret
+  labels:
+    app: nc-homelab-postgres
+data:
+  POSTGRES_DB: nextcloud
+  POSTGRES_USER: nextcloud
+  POSTGRES_PASSWORD: Linux!01
