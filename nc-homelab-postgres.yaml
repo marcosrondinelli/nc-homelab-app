@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment # Create a deployment
 metadata:
   name: nc-homelab-postgres # Set the name of the deployment
+  namespace: storage-cloud
 spec:
   replicas: 1 # Set N deployment replicas
   selector:
@@ -33,6 +34,7 @@ apiVersion: v1
 kind: Service # Create service
 metadata:
   name: nc-homelab-postgres-svc # Sets the service name
+  namespace: storage-cloud
   labels:
     app: nc-homelab-postgres # Defines app to create service for
 spec:
