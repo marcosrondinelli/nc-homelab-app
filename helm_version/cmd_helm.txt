@@ -1,0 +1,15 @@
+> helm install -f nc-home-helm.yaml nc-homelab-helm  nextcloud/nextcloud
+
+> kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/master/deploy/longhorn.yaml
+> kubectl patch storageclass longhorn -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+> kubectl apply -f  ../../longhorn/longhorn-sc-no-replica.yaml
+> kubectl apply -f  ../../longhorn/nodeport-longhorn-frontend.yaml
+> kubectl create namespace nextcloud
+> kubectl apply -f pvc-mr-nextcloud-20g.yaml
+> helm upgrade --install --namespace nextcloud -f helm-mr-nextcloud-values.yaml  nc-mr-dev nextcloud/nextcloud
+> kubectl apply -f ingress-OLD-nc-homelab.yaml
+
+
+> kubectl delete -f ingress-OLD-nc-homelab.yaml
+> helm uninstall nc-dev
+

@@ -3,10 +3,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nc-homelab-app-pvc-v3
-  namespace: storage-cloud
+  name: nc-homelab-postgres-pvc
+  namespace: nextcloud
   labels:
-    app: nc-homelab-app-pvc-v3
+    app: nc-homelab-postgres-pvc
 spec:
   storageClassName: local-path #Opcional pq este é o SC default
   volumeMode: Filesystem  #Opcional pq este é o modo default. (Filesystem or Block)

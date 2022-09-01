@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: loadbalancer-helm-nc-homelab
+  namespace: nextcloud
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: nextcloud
+    #app.kubernetes.io/instance: nc-homelab-helm
+  ports:
+    - port: 80         # IP_EXTERNO:80 -> Endereco p/ acessar externamente 
+      targetPort: 80   # Porta que o app escuta internamente

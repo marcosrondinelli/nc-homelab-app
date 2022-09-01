@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet      # < kind of installation (statefulset vs Deployment)
 metadata:
   name: nextcloud-db   # < name of the deployment
-  namespace: storage-cloud # < namespace where to place the statefulset and pods
+  namespace: nextcloud # < namespace where to place the statefulset and pods
   labels:
     app: nextcloud     # < label for tagging and reference
 spec:
@@ -46,7 +46,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: nextcloud-db-service           # < service name (see link with statufulset yaml)
-  namespace: storage-cloud
+  namespace: nextcloud
 spec:
   selector:
     pod-label: nextcloud-db-pod        # < reference to the statefulset (connects the service with the statefulset)

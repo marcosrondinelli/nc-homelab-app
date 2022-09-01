@@ -5,7 +5,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: nc-homelab-app-pv-v2 #Nome do PV
-  namespace: storage-cloud
+  namespace: nextcloud
   labels:
     type: local
 spec:
@@ -24,7 +24,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: nc-homelab-app-pvc-v2
-  namespace: storage-cloud
+  namespace: nextcloud
 spec:
   storageClassName: local-nc-homelab #Deve ter o mesmo nome do SC do PV
   accessModes:

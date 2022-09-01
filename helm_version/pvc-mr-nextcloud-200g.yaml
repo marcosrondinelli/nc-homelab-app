@@ -1,0 +1,15 @@
+#É o PVC que irá definir a capacidade e criar o volume que 
+#posteriormente será usado por um pod.
+#Este "pedaço" volumetrico será retirado do PersistentVolume anteriormente criado 
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-mr-nextcloud-200g
+  namespace: nextcloud
+spec:
+  storageClassName: longhorn-no-replica #Deve ter o mesmo nome do SC do PV
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi #Capacidade do volume. Não pode superar o espaco disponivel PV. Apesar de ser possivel colocar um tamanho menor, o volume ira ficar com o tamanho do definido la no PV

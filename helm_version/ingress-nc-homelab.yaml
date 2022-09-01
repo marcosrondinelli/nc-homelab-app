@@ -1,0 +1,31 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ingress-http-nc-homelab
+  namespace: nextcloud
+spec:
+  entryPoints:
+    - web
+  routes:
+  - kind: Rule
+    match: Host(`nc.mrondinelli.com.br`)
+    services:
+    - name: nc-mr-prod-nextcloud
+      port: 8080
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ingress-tls-nc-homelab
+  namespace: nextcloud
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - kind: Rule
+    match: Host(`nc.mrondinelli.com.br`)
+    services:
+    - name: nc-mr-prod-nextcloud
+      port: 8080
+  tls:
+    certResolver: le

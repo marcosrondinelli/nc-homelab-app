@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet      # < kind of installation (statefulset vs Deployment)
 metadata:
   name: nc-homelab-db   # < name of the deployment
-  namespace: storage-cloud # < namespace where to place the statefulset and pods
+  namespace: nextcloud # < namespace where to place the statefulset and pods
   labels:
     app: nc-homelab-db     # < label for tagging and reference
 spec:
@@ -46,7 +46,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: nc-homelab-db-service           # < service name (see link with statufulset yaml)
-  namespace: storage-cloud
+  namespace: nextcloud
 spec:
   selector:
     pod-label: nc-homelab-db-pod        # < reference to the statefulset (connects the service with the statefulset)

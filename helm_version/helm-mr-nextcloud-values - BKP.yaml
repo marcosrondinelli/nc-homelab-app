@@ -1,0 +1,264 @@
+image:
+  repository: nextcloud
+  flavor: apache
+  # If unset, uses flavor + .Chart.AppVersion to create tag
+  # tag:
+  pullPolicy: IfNotPresent
+  # pullSecrets:
+  #   - myRegistrKeySecretName
+
+
+nextcloud:
+  host: nextcloud.homelab
+  username: marcos
+  password: Linux!01
+  ## Use an existing secret
+  existingSecret:
+    enabled: false
+    # secretName: nameofsecret
+    # usernameKey: username
+    # passwordKey: password
+    # tokenKey: serverinfo_token
+    # smtpUsernameKey: smtp_username
+    # smtpPasswordKey: smtp_password
+  update: 0
+  # If web server is not binding default port, you can define it
+  # containerPort: 8080
+  datadir: /var/www/html/data
+  persistence:
+    subPath:
+  mail:
+    enabled: false
+    fromAddress: user
+    domain: domain.com
+    smtp:
+      host: domain.com
+      secure: ssl
+      port: 465
+      authtype: LOGIN
+      name: user
+      password: pass
+  # PHP Configuration files
+  # Will be injected in /usr/local/etc/php/conf.d for apache image and in /usr/local/etc/php-fpm.d when nginx.enabled: true
+  phpConfigs: {}
+  # Default config files
+  # IMPORTANT: Will be used only if you put extra configs, otherwise default will come from nextcloud itself
+  # Default confgurations can be found here: https://github.com/nextcloud/docker/tree/master/16.0/apache/config
+  defaultConfigs:
+    # To protect /var/www/html/config
+    .htaccess: true
+    # Redis default configuration
+    redis.config.php: false
+    # Apache configuration for rewrite urls
+    apache-pretty-urls.config.php: true
+    # Define APCu as local cache
+    apcu.config.php: true
+    # Apps directory configs
+    apps.config.php: true
+    # Used for auto configure database
+    autoconfig.php: true
+    # SMTP default configuration
+    smtp.config.php: true
+  # Extra config files created in /var/www/html/config/
+  # ref: https://docs.nextcloud.com/server/15/admin_manual/configuration_server/config_sample_php_parameters.html#multiple-config-php-file
+  configs:
+    mrcustom.config.php: |-
+      <?php
+      $CONFIG = array (
+        'filelocking.enabled' => 'true',
+        'loglevel' => '2',
+        'enable_previews' => true,
+        'overwriteprotocol' => 'https',
+        'trusted_domains' =>
+          array (
+           0 => '192.168.0.*',
+           1 => 'localhost',
+           2 => 'nextcloud.homelab',
+           3 => 'mrondinelli.homelab',
+           4 => 'mrondinelli.com.br',
+           5 => 'nc.mrondinelli.com.br',
+          )
+      );
+    mrredis.config.php: |-
+      <?php
+      $CONFIG = array (
+        'memcache.local' => '\\OC\\Memcache\\Redis',
+        'memcache.distributed' => '\OC\Memcache\Redis',
+        'memcache.locking' => '\OC\Memcache\Redis',
+        'redis' => array(
+          'host' => getenv('REDIS_HOST'),
+          'port' => getenv('REDIS_HOST_PORT') ?: 6379,
+          'password' => getenv('REDIS_HOST_PASSWORD')
+        )
+      );
+  
+  ## Strategy used to replace old pods
+  ## IMPORTANT: use with care, it is suggested to leave as that for upgrade purposes
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  strategy:
+    type: Recreate
+    # type: RollingUpdate
+    # rollingUpdate:
+    #   maxSurge: 1
+    #   maxUnavailable: 0
+
+  ##
+  ## Extra environment variables
+  extraEnv:
+  #  - name: SOME_SECRET_ENV
+  #    valueFrom:
+  #      secretKeyRef:
+  #        name: nextcloud
+  #        key: secret_key
+
+  # Extra init containers that runs before pods start.
+  extraInitContainers: []
+  #  - name: do-something
+  #    image: busybox
+  #    command: ['do', 'something']
+
+  # Extra mounts for the pods. Example shown is for connecting a legacy NFS volume
+  # to NextCloud pods in Kubernetes. This can then be configured in External Storage
+  extraVolumes:
+  #  - name: nfs
+  #    nfs:
+  #      server: "10.0.0.1"
+  #      path: "/nextcloud_data"
+  #      readOnly: false
+  extraVolumeMounts:
+  #  - name: nfs
+  #    mountPath: "/legacy_data"
+
+  # Extra secuurityContext parameters. For example you may need to define runAsNonRoot directive
+  # extraSecurityContext:
+  #   runAsUser: "33"
+  #   runAsGroup: "33"
+  #   runAsNonRoot: true
+  #   readOnlyRootFilesystem: true
+
+### Finish Nextcloud Section
+
+## Enable persistence for Nextcloud using Persistent Volume Claims
+## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  # Nextcloud Data (/var/www/html)
+  enabled: true
+  annotations: {}
+  ## nextcloud data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+
+  ## A manually managed Persistent Volume and Claim
+  ## Requires persistence.enabled: true
+  ## If defined, PVC must be created manually before volume will be bound
+  # existingClaim:
+
+  accessMode: ReadWriteOnce
+  size: 1Gi # Por ser local é ilimitado
+
+  ## Use an additional pvc for the data directory rather than a subpath of the default PVC
+  ## Useful to store data on a different storageClass (e.g. on slower disks)
+  nextcloudData:
+    enabled: false
+    subPath:
+    annotations: {}
+    # storageClass: "-"
+    # existingClaim:
+    accessMode: ReadWriteOnce
+    size: 8Gi 
+
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: 'Linux!01'
+
+internalDatabase:
+  enabled: false
+  name: nextcloud
+
+mariadb:
+  ## Whether to deploy a mariadb server to satisfy the applications database requirements. To use an external database set this to false and configure the externalDatabase parameters
+  enabled: true
+
+  auth:
+    database: nextcloud
+    username: nextcloud
+    password: Linux!01
+
+  architecture: standalone
+
+  ## Enable persistence using Persistent Volume Claims
+  ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+  ##
+  primary:
+    persistence:
+      enabled: true
+      # storageClass: "local-path"
+      accessMode: ReadWriteOnce
+      size: 1Gi # Por ser local é ilimitado
+
+service:
+  type: ClusterIP
+  port: 8080
+  loadBalancerIP: false
+  nodePort: nil
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+## Liveness and readiness probe values
+## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
+##
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 120
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 120
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 30
+  successThreshold: 1
+
+
+## Enable pod autoscaling using HorizontalPodAutoscaler
+## ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+##
+hpa:
+  enabled: false
+  cputhreshold: 60
+  minPods: 1
+  maxPods: 10
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

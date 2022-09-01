@@ -4,7 +4,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: nc-homelab-postgres-secret
-  namespace: storage-cloud
+  namespace: nextcloud
   labels:
     app: nc-homelab-postgres
 data:

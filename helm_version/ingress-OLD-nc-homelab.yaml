@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ing-nc-homelab
+  namespace: nextcloud
+  
+spec:
+  rules:
+    - host: nc.mrondinelli.com.br
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nc-mr-prod-nextcloud
+                port:
+                  number: 8080

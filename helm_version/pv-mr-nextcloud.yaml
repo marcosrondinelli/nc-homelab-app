@@ -1,0 +1,17 @@
+# Persistent Volume define a capacidade volumétrica, 
+# porém não cria nenhum volume efetivamente. É o recurso PVC (Pers. Vol. Claim) 
+# que irá definir o tamanho e criar efetivamente o volume a ser usado por um POD.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-10gi #Nome do PV
+  labels:
+    type: local
+spec:
+  storageClassName: hostpath #Pode ser qualquer nome contanto que o PVC aponte para ele. 
+  capacity:
+    storage: 10Gi #Capacidade volumétrica de entrega. É o PVC que irá definir o tamanho do volume.
+  accessModes:
+    - ReadWriteOnce #Somente um único Node pode montar esse PV em read-write 
+  hostPath:
+    path: "/appdata" #Local onde os volumes serao criados no Node
