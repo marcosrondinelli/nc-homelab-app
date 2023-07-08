@@ -29,3 +29,6 @@ spec:
       port: 8080
   tls:
     certResolver: le
+    #options:
+    #  name: tlsoptions
+    #  namespace: nextcloud
